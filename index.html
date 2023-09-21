@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora de Exercícios</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div id="container">
+      <h1>Calculadora de Exercícios</h1>
+      <label for="exerciseSelect">Escolha o exercício:</label>
+      <select id="exerciseSelect">
+        <option value="exercise1">
+          Exercício 1 - Elementos de um Conjunto Finito
+        </option>
+        <option value="exercise2">
+          Exercício 2 - Expressão Aritmética em Notação Pós-fixa
+        </option>
+        <option value="exercise3a">
+          Exercício 3a - Expressão Aritmética em Notação In-fixa (com
+          Parênteses)
+        </option>
+        <option value="exercise3b">
+          Exercício 3b - Expressão Aritmética em Notação In-fixa (sem
+          Parênteses)
+        </option>
+        <option value="exercise4">Exercício 4 - Valor de P(n, r)</option>
+        <option value="exercise5">Exercício 5 - Valor de C(n, r)</option>
+        <option value="exercise6">
+          Exercício 6 - Todos os Valores de C(n, r)
+        </option>
+        <option value="exercise7">Exercício 7 - Valor de (a + b)^n</option>
+      </select>
+      <br> <br>
+      <div id="exerciseForms">
+        <!-- Os formulários dos exercícios serão carregados aqui -->
+      </div>
+      <div id="result"></div>
+
+      <!-- Instruções para o usuário -->
+      <div id="instructions">
+        <h2>Instruções:</h2>
+        <p>1. Escolha um exercício no menu suspenso acima.</p>
+        <p>2. Preencha os campos necessários no formulário gerado.</p>
+        <p>3. Clique no botão "Calcular" para obter o resultado.</p>
+      </div>
+    </div>
+
+    <script>
+      // Função para criar o formulário do exercício selecionado
+      function createExerciseForm() {
+        const exerciseSelect = document.getElementById("exerciseSelect");
+        const selectedExercise = exerciseSelect.value;
+        const exerciseForms = document.getElementById("exerciseForms");
+        exerciseForms.innerHTML = "";
+        clearCalculationMemory();
+
+        // Crie o formulário com base no exercício selecionado
+        switch (selectedExercise) {
+          case "exercise1":
+            exerciseForms.innerHTML = `
+                        <label for="setElements">Elementos do conjunto (separados por vírgula):</label>
+                        <input type="text" id="setElements">
+                        <button onclick="displayElements()">Calcular</button>
+                    `;
+            break;
+          case "exercise2":
+            exerciseForms.innerHTML = `
+                        <label for="postfixExpression">Expressão aritmética (notação pós-fixa):</label>
+                        <input type="text" id="postfixExpression">
+                        <button onclick="calculatePostfixExpression()">Calcular</button>
+                    `;
+            break;
+          case "exercise3a":
+            exerciseForms.innerHTML = `
+                        <label for="infixExpression">Expressão aritmética (notação in-fixa com parênteses):</label>
+                        <input type="text" id="infixExpression">
+                        <button onclick="convertToPostfix()">Converter para pós-fixa</button>
+                    `;
+            break;
+          case "exercise3b":
+            exerciseForms.innerHTML = `
+                        <label for="infixExpression">Expressão aritmética (notação in-fixa sem parênteses):</label>
+                        <input type="text" id="infixExpression">
+                        <button onclick="calculateInfixExpression()">Calcular</button>
+                    `;
+            break;
+          case "exercise4":
+            exerciseForms.innerHTML = `
+                        <label for="n">Valor de n:</label>
+                        <input type="number" id="n">
+                        <label for="r">Valor de r:</label>
+                        <input type="number" id="r">
+                        <button onclick="calculateP()">Calcular P(n, r)</button>
+                    `;
+            break;
+          case "exercise5":
+            exerciseForms.innerHTML = `
+                        <label for="n">Valor de n:</label>
+                        <input type="number" id="n">
+                        <label for="r">Valor de r:</label>
+                        <input type="number" id="r">
+                        <button onclick="calculateC()">Calcular C(n, r)</button>
+                    `;
+            break;
+          case "exercise6":
+            exerciseForms.innerHTML = `
+                        <label for="n">Valor de n:</label>
+                        <input type="number" id="n">
+                        <button onclick="calculateAllC()">Calcular Todos os Valores de C(n, r)</button>
+                    `;
+            break;
+          case "exercise7":
+            exerciseForms.innerHTML = `
+                        <label for="a">Valor de a:</label>
+                        <input type="number" id="a">
+                        <label for="b">Valor de b:</label>
+                        <input type="number" id="b">
+                        <label for="n">Valor de n:</label>
+                        <input type="number" id="n">
+                        <button onclick="calculateBinomialTheorem()">Calcular (a + b)^n</button>
+                    `;
+            break;
+          default:
+            exerciseForms.innerHTML = "";
+        }
+      }
+
+      // Adicione um ouvinte de evento para chamar createExerciseForm quando a seleção for alterada
+      const exerciseSelect = document.getElementById("exerciseSelect");
+      exerciseSelect.addEventListener("change", createExerciseForm);
+
+      // Funções de cálculo para cada exercício
+      function displayElements() {
+        const setElements = document.getElementById("setElements").value;
+        const elementsArray = setElements
+          .split(",")
+          .map((element) => element.trim());
+        const result = `Elementos do conjunto: [${elementsArray.join(", ")}]`;
+        displayResult(result);
+      }
+
+      function calculatePostfixExpression() {
+        const postfixExpression =
+          document.getElementById("postfixExpression").value;
+        const result = calculatePostfix(postfixExpression);
+        displayResult(`Valor da expressão: ${result}`);
+      }
+
+      function convertToPostfix() {
+        const infixExpression =
+          document.getElementById("infixExpression").value;
+        const postfixExpression = infixToPostfix(infixExpression);
+        displayResult(`Expressão pós-fixa: ${postfixExpression}`);
+      }
+
+      function calculateInfixExpression() {
+        const infixExpression =
+          document.getElementById("infixExpression").value;
+        const result = calculateInfix(infixExpression);
+        displayResult(`Valor da expressão: ${result}`);
+      }
+
+      function calculateP() {
+        const n = parseInt(document.getElementById("n").value);
+        const r = parseInt(document.getElementById("r").value);
+        const result = calculatePermutation(n, r);
+        displayResult(`Valor de P(${n}, ${r}): ${result}`);
+      }
+
+      function calculateC() {
+        const n = parseInt(document.getElementById("n").value);
+        const r = parseInt(document.getElementById("r").value);
+        const result = calculateCombination(n, r);
+        displayResult(`Valor de C(${n}, ${r}): ${result}`);
+      }
+
+      function calculateAllC() {
+        const n = parseInt(document.getElementById("n").value);
+        const results = calculateAllCombinations(n);
+        displayResult(`Todos os valores de C(${n}, r): ${results.join(", ")}`);
+      }
+
+      function calculateBinomialTheorem() {
+        const a = parseInt(document.getElementById("a").value);
+        const b = parseInt(document.getElementById("b").value);
+        const n = parseInt(document.getElementById("n").value);
+        const result = calculateBinomialExpansion(a, b, n);
+        displayResult(`Valor de (${a} + ${b})^${n}: ${result}`);
+      }
+
+      // Função para exibir o resultado
+      function displayResult(result) {
+        const resultElement = document.getElementById("result");
+        resultElement.textContent = `Resultado: ${result}`;
+      }
+
+      // Função para limpar a memória de cálculo
+      function clearCalculationMemory() {
+        const resultElement = document.getElementById("result");
+        resultElement.textContent = "";
+      }
+
+      // Funções de cálculo específicas para cada exercício
+
+      // Função para calcular expressão pós-fixa (Exercício 2)
+      function calculatePostfix(postfixExpression) {
+        const stack = [];
+        const operators = "+-*/";
+
+        for (const token of postfixExpression.split(" ")) {
+          if (!operators.includes(token)) {
+            stack.push(parseFloat(token));
+          } else {
+            const b = stack.pop();
+            const a = stack.pop();
+            switch (token) {
+              case "+":
+                stack.push(a + b);
+                break;
+              case "-":
+                stack.push(a - b);
+                break;
+              case "*":
+                stack.push(a * b);
+                break;
+              case "/":
+                stack.push(a / b);
+                break;
+            }
+          }
+        }
+
+        return stack.pop();
+      }
+
+      // Função para converter in-fixa para pós-fixa (Exercício 3a)
+      function infixToPostfix(infixExpression) {
+        const precedence = { "+": 1, "-": 1, "*": 2, "/": 2, "^": 3 };
+        const output = [];
+        const operatorStack = [];
+
+        for (const token of infixExpression.split(" ")) {
+          if (!isNaN(token)) {
+            output.push(token);
+          } else if (token in precedence) {
+            while (
+              operatorStack.length > 0 &&
+              operatorStack[operatorStack.length - 1] !== "(" &&
+              precedence[token] <=
+                precedence[operatorStack[operatorStack.length - 1]]
+            ) {
+              output.push(operatorStack.pop());
+            }
+            operatorStack.push(token);
+          } else if (token === "(") {
+            operatorStack.push(token);
+          } else if (token === ")") {
+            while (
+              operatorStack.length > 0 &&
+              operatorStack[operatorStack.length - 1] !== "("
+            ) {
+              output.push(operatorStack.pop());
+            }
+            if (operatorStack[operatorStack.length - 1] === "(") {
+              operatorStack.pop();
+            }
+          }
+        }
+
+        while (operatorStack.length > 0) {
+          output.push(operatorStack.pop());
+        }
+
+        return output.join(" ");
+      }
+
+      // Função para calcular in-fixa (Exercício 3b)
+      function calculateInfix(infixExpression) {
+        const postfixExpression = infixToPostfix(infixExpression);
+        return calculatePostfix(postfixExpression);
+      }
+
+      // Função para calcular P(n, r) (Exercício 4)
+      function calculatePermutation(n, r) {
+        if (n < 0 || r < 0 || r > n) {
+          return "Inválido";
+        }
+
+        let result = 1;
+        for (let i = 0; i < r; i++) {
+          result *= n - i;
+        }
+
+        return result;
+      }
+
+      // Função para calcular C(n, r) (Exercício 5)
+      function calculateCombination(n, r) {
+        if (n < 0 || r < 0 || r > n) {
+          return "Inválido";
+        }
+
+        function factorial(x) {
+          if (x === 0) return 1;
+          return x * factorial(x - 1);
+        }
+
+        return factorial(n) / (factorial(r) * factorial(n - r));
+      }
+
+      // Função para calcular todos os valores de C(n, r) (Exercício 6)
+      function calculateAllCombinations(n) {
+        const results = [];
+        for (let r = 0; r <= n; r++) {
+          results.push(calculateCombination(n, r));
+        }
+        return results;
+      }
+
+      // Função para calcular (a + b)^n usando o Teorema Binomial (Exercício 7a)
+      function calculateBinomialExpansion(a, b, n) {
+        let result = 0;
+        for (let r = 0; r <= n; r++) {
+          result +=
+            calculateCombination(n, r) * Math.pow(a, n - r) * Math.pow(b, r);
+        }
+        return result;
+      }
+
+      // Chame createExerciseForm para criar o formulário inicial
+      createExerciseForm();
+    </script>
+  </body>
+</html>
